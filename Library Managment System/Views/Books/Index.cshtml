@@ -1,0 +1,38 @@
+﻿@model IEnumerable<Library_Managment_System.Models.Book>
+
+@{
+    ViewBag.Title = "Books";
+}
+
+<table class="table table-bordered">
+    <tr>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Number Available</th>
+        <th>Number In Stock</th>
+        <th>Category</th>
+
+
+    </tr>
+
+@foreach (var book in Model)
+{
+    <tr>
+        <td>
+            @book.Name
+        </td>
+        <td>
+            $@book.Price
+        </td>
+        <td>
+            @book.NumberAvailable
+        </td>
+        <td>
+            @book.NumberInStock
+        </td>
+        <td>
+            @book.Category.Name
+        </td>
+    </tr>
+}
+</table>

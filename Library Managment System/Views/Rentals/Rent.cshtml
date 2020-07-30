@@ -1,0 +1,168 @@
+﻿@model Library_Managment_System.Dtos.NewRentalDto
+
+@{
+    ViewBag.Title = "Rent";
+}
+
+<form id="RentalForm">
+
+    @*<div class="form-group">
+        <label>User Name</label>
+        <div class="tt-container">
+            <input type="text" class="form-control" id="userid" />
+        </div>
+    </div>*@
+
+    <div class="form-group">
+        @*@Html.LabelFor(m => m.BooksIds)
+            @Html.TextBoxFor(m => m.BooksIds, new { @class = "form-control" })*@
+        <label>Books To Rent</label>
+        <div class="tt-container">
+            <input type="text" class="form-control" id="bookid" />
+        </div>
+    </div>
+
+    <div class="form-group">
+
+        <ul id="js_list"></ul>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <input type="submit" value="Submit" class="btn btn-primary" />
+    </div>
+</form>
+
+
+
+@section scripts{
+
+    <script>
+
+        $(document).ready(function () {
+            //Why i put BooksIds[]   and   int userId  inside ViewModel, this variable considered as an object we will send
+            //it to api have an Object parameter not a value type variable, it is NewRentalDto exactly 
+            // or or or, you can serialize a form to send it for Object parameter.
+
+            //NOTE: Recently we decide to don't make user send his name to API so we remark  all things belong to this
+            // so in API there will not be a NewRentalDto obj, we just send a list<int> booksids.
+            //var ViewModel = {
+            //    BooksIds: []
+
+            //};
+
+            var BooksIds = [];
+
+            //NOW here user shouldn't send or select his name from a list unless he logged in
+            //SO system should know what his name for this user unless he logged in, not he select between users of our system
+            //Mohammad, Ahmad, Amera, .... it is stupid thing.... so just send a books you want to rent for API
+
+                                    //////var users = new Bloodhound({
+                                    //////    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('userName'),
+                                    //////    queryTokenizer: Bloodhound.tokenizers.whitespace,
+                                    //////    //prefetch: {
+                                    //////    //    url: '/Api/Users?query=%QUERY',
+                                    //////    //    cache: false
+                                    //////    //}
+                                    //////    remote: {
+                                    //////        url: '/api/users?query=%QUERY',
+                                    //////        wildcard: '%QUERY'
+
+                                    //////    }
+                                    //////});//end of Bloodhound
+
+
+                                    //////$('#userid').typeahead({
+                                    //////    minLength: 0,
+                                    //////    highlight: true
+                                    //////}, {
+                                    //////    name: 'users',
+                                    //////    display: 'userName',
+                                    //////    //somthing that you want display from customer
+                                    //////    //obj tht come from Api---> like this:
+                                    //////    //customerDto.name **** Look to the first letter it is small letter WHY!!
+                                    //////    // because we will consume json objects that come from APIs HERE in
+                                    //////    //javascript, and javascript use camel notation so we should convert it to
+                                    //////    //camel notation as javascript..
+                                    //////    // NOTE if you keep it as it was recieve it will not make an error
+                                    //////    //but it is a litle bit ugly... (json - javascript) object formats.
+                                    //////    source: users,
+
+
+
+
+                                    //////}).on("typeahead:select", function (e, user) {
+
+                                    //////    ViewModel.UserId = user.id;
+
+                                    //////});
+
+
+            ////////////////////////////////////////////////////////////////////
+
+            var books = new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                //prefetch: {
+                //    url: '/Api/Users?query=%QUERY',
+                //    cache: false
+                //}
+                remote: {
+                    url: '/api/books?query=%QUERY',
+                    wildcard: '%QUERY'
+
+                }
+            });//end of Bloodhound
+
+
+            $('#bookid').typeahead({
+                minLength: 0,
+                highlight: true
+            }, {
+                name: 'books',
+                display: 'name',
+                //somthing that you want display from customer
+                //obj that come from Api---> like this:
+                //customerDto.name **** Look to the first letter it is small letter WHY!!
+                // because we will consume json objects that come from APIs HERE in
+                //javascript, and javascript use camel notation so we should convert it to
+                //camel notation as javascript..
+                // NOTE if you keep it as it was recieve it will not make an error
+                //but it is a litle bit ugly... (json - javascript) object formats.
+                source: books,
+                limit: 90
+
+
+
+
+            }).on("typeahead:select", function (e, book) {
+
+                BooksIds.push(book.id);//Note that id with (i) in small letter (JavaScript Format).
+
+                $("#js_list").append("<li>" + book.name + " </li>");
+
+                $("#bookid").typeahead("val", "");
+
+
+            });
+
+
+            $("#RentalForm").submit(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: "/api/newRentals/RentBook",
+                    method: "post",
+                    data: { '': BooksIds }, //♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥
+                    success: function () { alert("Mapping Successful") },
+                failure: function () { alert("not working..."); }
+                });
+
+                //$.post('/api/newRentals', { BooksIds: BooksIds }, function () { });
+
+            });
+
+        });
+    </script>
+}
